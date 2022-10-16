@@ -83,15 +83,15 @@ with open("password_and_salt.txt", "w") as f:
 # оптимизированное решение
 @profile
 def get_pswd_():
-    get_pswd = input("Введите пароль: ")
+    get_pswd_ = input("Введите пароль: ")
     salt = "salt"
-    res = sha256((get_pswd.encode()) + (salt.encode())).hexdigest()
+    res = sha256((get_pswd_.encode()) + (salt.encode())).hexdigest()
     print(f'В базе данных хранится строка: {res}')
     repeat = input("Введите пароль еще раз для проверки: ")
     res_ = sha256((repeat.encode()) + (salt.encode())).hexdigest()
     if res_ == res:
         print("Вы ввели правильный пароль")
-        del res_
+        del res_, get_pswd_, repeat
         return res, salt
     else:
         print("Пароли не совпадают")
@@ -100,5 +100,5 @@ def get_pswd_():
 with open("password_and_salt1.txt", "w") as f:
     json.dump(get_pswd_(), f)
 
-# использовал инструкцию del для удаления имени res_. В таблице memory_profiler изменений не произошло, тк имя занимает
-# мало памяти.
+# использовал инструкцию del для удаления имени res_, get_pswd_, repeat. В таблице memory_profiler
+# изменений не произошло, тк имя занимает мало памяти.

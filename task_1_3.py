@@ -49,6 +49,7 @@ adjectives = ["веселый", "яркий", "зеленый", "утопичн�
 from random import choice
 from collections import defaultdict
 from memory_profiler import profile
+from pympler import asizeof
 
 nouns = ["автомобиль", "лес", "огонь", "город", "дом"]
 adverbs = ["сегодня", "вчера", "завтра", "позавчера", "ночью"]
@@ -63,7 +64,7 @@ def get_joke(nums):
         second = choice(adverbs)
         third = choice(adjectives)
         jokes.append(f'{first}, {second}, {third}')
-    print(jokes)
+    print(jokes, asizeof.asizeof(jokes))
 
 
 get_joke(3)
@@ -71,12 +72,16 @@ get_joke(3)
 
 @profile
 def get_joke_(nums):
-    jokes = defaultdict(list)
-    [jokes[choice(nouns), choice(adverbs), choice(adjectives)] for num in range(nums)]
-    return list(jokes)
+    jokes = []
+    for num in range(nums):
+        first = choice(nouns)
+        second = choice(adverbs)
+        third = choice(adjectives)
+        jokes.append(f'{first}, {second}, {third}')
+        del first, second, third
+    return jokes, asizeof.asizeof(jokes)
 
 
 print(get_joke_(3))
 
-# заменил цикл for in на list comprehension, использовал метод defaultdict вместо создания пустого списка,
-# сократил количество строк кода в 2 раза
+# удалил ссылки first, second, third при помощи del

@@ -46,6 +46,8 @@
 """
 from memory_profiler import profile
 from collections import defaultdict
+from pympler import asizeof
+from json import dumps, loads
 
 
 # исходное решение
@@ -55,7 +57,7 @@ def thesaurus(*args):
     for letter in args:
         directory[letter[0]] = directory.setdefault(letter[0], []) + [letter]
     directory = sorted(directory.items())
-    print(dict(directory))
+    print(dict(directory), type(dict(directory)), asizeof.asizeof(directory))
 
 
 thesaurus('Вася', 'Петр', 'Игорь', 'Ирина', 'Абрам', 'Валера', 'Дмитрий', 'Полина', 'Света', 'Максим', 'Лео', 'Леонид',
@@ -65,15 +67,17 @@ thesaurus('Вася', 'Петр', 'Игорь', 'Ирина', 'Абрам', 'В�
 # оптимизированное решение
 @profile
 def thesaurus_(*args):
-    directory = defaultdict(list)
+    directory = {}
     for letter in args:
-        directory[letter[0]] = directory.get(letter[0], []) + [letter]
+        directory[letter[0]] = directory.setdefault(letter[0], []) + [letter]
     directory = sorted(directory.items())
-    return directory
+    dump_dir = dumps(directory)
+    del directory
+    return loads(dump_dir), type(loads(dump_dir)), asizeof.asizeof(dump_dir)
 
 
 print(thesaurus_('Вася', 'Петр', 'Игорь', 'Ирина', 'Абрам', 'Валера', 'Дмитрий', 'Полина', 'Света', 'Максим', 'Лео',
                  'Леонид', 'Люся'))
 
-# применил вместо создания словаря метод setdefalt(), который должен работь быстрей, тк на его основе создается список
-# из кортежей
+# применил удаление del к ссылке directory
+# применил сериализацию для записи имен при помощи json.dumps(Размер directory 2896, размер json 616)
