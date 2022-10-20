@@ -56,6 +56,8 @@ import json
 
 from memory_profiler import profile
 from collections import defaultdict
+from json import loads, dumps
+from pympler import asizeof
 
 
 # исходный код
@@ -68,8 +70,7 @@ def thesaurus_adv(*name_surenames):
         my_dict[sure_name[0]].setdefault(name[0], [])
         my_dict[sure_name[0]][name[0]].append(name_surename)
     sorted_dict = {x: my_dict[x] for x in sorted(my_dict)}
-    print(my_dict)
-    print(dict(sorted_dict))
+    print(dict(sorted_dict), type(dict(sorted_dict)), asizeof.asizeof(sorted_dict))
 
 
 thesaurus_adv("Иван Сергеев", "Инна Серова", "Петр Алексеев", "Илья Иванов", "Анна Савельева", "Ирина Светлова",
@@ -86,14 +87,15 @@ def thesaurus_adv(*name_surenames):
         my_dict[sure_name[0]].setdefault(name[0], [])
         my_dict[sure_name[0]][name[0]].append(name_surename)
     sorted_dict = sorted(my_dict.items())
-    return sorted_dict
+    dumped_dict = dumps(sorted_dict)
+    del my_dict, sorted_dict
+    return loads(dumped_dict), type(loads(dumped_dict)), asizeof.asizeof(dumped_dict)
 
 
-with open("names_surnames.txt", "w", encoding="utf-8") as f:
-    json.dump(
-        thesaurus_adv("Иван Сергеев", "Инна Серова", "Петр Алексеев", "Илья Иванов", "Анна Савельева", "Ирина Светлова",
-                      "Марьяна Ладыгина", "Алина Семенова", "Евгений Антонов"), f)
+print(thesaurus_adv("Иван Сергеев", "Инна Серова", "Петр Алексеев", "Илья Иванов", "Анна Савельева", "Ирина Светлова",
+              "Марьяна Ладыгина", "Алина Семенова", "Евгений Антонов"))
 
 
-# применил сериализацию для записи имен и фамилий при помощи JSON, заменил dict comrehension на встроенную функцию
-# sorted(). В итоге сэкономил 0,1 MiB.
+# применил сериализацию для записи имен и фамилий при помощи json.dumps(Размер dict 3416, размер json 888)
+# заменил dict comrehension на встроенную функцию sorted().
+# применил удаление ссылок del для my_dict, sorted_dict

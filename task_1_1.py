@@ -56,25 +56,31 @@ from memory_profiler import profile
 
 # исходное решение
 @profile
-def rev(n, residue=''):
-    residue = residue + str(int(n) % 10)
-    n = int(n) // 10
-    if n == 0:
-        return residue
-    return rev(n, residue)
+def memo(func):
+    def rev(n, residue=''):
+        residue = residue + str(int(n) % 10)
+        n = int(n) // 10
+        if n == 0:
+            return residue
+        return rev(n, residue)
+    return func
 
 
 # оптимизированное решение
 @profile
 def rev_1(n):
-    n_list = list(n)[::-1]
-    return ''.join(n_list)
+    n_list = list(n)
+    n_list_rev = map(reversed, n_list)
+    del n_list
+    return ''.join(str(n_list_rev))
 
 
 if __name__ == "__main__":
-    print(rev("01230"))
+    print(memo("01230"))
     print(rev_1("01230"))
 
-# оптимизировал код, сделал его более лаконичным, использовав встроенную функцию list(), метод .join() и срез [::-1]
-# по скорости выполнения получилось похоже, но в перврм случае мы вызываем функцию 4 раза, что заметно увеличивает
-# время выполнения
+# для оптимизации кода использовал использовал встроенную функцию map для перевертывания списка n_list при помощи
+# встроенной функции reversed не изменяя его.
+# после удалил ссылку при помощи del на первоначальный список n_list
+# для удобства вывода таблицы с профилированием памяти обернул функцию rev(n, residue='') в функцию memo(func)
+# в итоге происходит запуск 1 таблицы
